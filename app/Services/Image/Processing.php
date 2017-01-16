@@ -16,7 +16,6 @@ class Processing {
      */
     static function resizeImageByFilename($originalFileName, $newWidth, $newHeight)
     {
-        /** @var \Intervention\Image\Image $img */
         $img = Image::make(base_path() . ImageModel::PATH . $originalFileName);
         $img->resize($newWidth, $newHeight);
 

@@ -5,6 +5,7 @@ use Auth;
 use Illuminate\Support\Facades\Request;
 use \App\Services\Api\Errors as ApiErrors;
 use App\Models\User;
+use \App\Models\Image;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class ApiController extends Controller {
@@ -46,12 +47,14 @@ class ApiController extends Controller {
     {
         if(!Request::input('user_id')|| empty(Request::input('user_id'))) {
             $apiError = Errors::getApiError(Errors::API_ERROR_USER_ID_IS_REQUIRED);
+
             return response()->json($apiError['data'], $apiError['code']);
         }
 
         $checkUser = User::find(Request::input('user_id'));
         if($checkUser instanceof User) {
             $apiError = ApiErrors::getApiError(ApiErrors::API_ERROR_USER_ALREADY_EXISTS);
+
             return response()->json($apiError['data'], $apiError['code']);
         }
 
@@ -60,6 +63,7 @@ class ApiController extends Controller {
 
         $token = JWTAuth::fromUser($user);
         $data = ['status' => 'success', 'token' => $token];
+
         return response()->json($data);
     }
 
@@ -87,10 +91,8 @@ class ApiController extends Controller {
      */
     public function resizeNewImage()
     {
-        /** @var User $user */
         $user = Auth::user();
 
-        /** @var \Symfony\Component\HttpFoundation\File\UploadedFile $file */
         $file = Request::file('image');
 
         $newWidth = (int)Request::input('width');
@@ -99,6 +101,7 @@ class ApiController extends Controller {
         if(!$this->_apiService->checkMimeType($file))
         {
             $apiError = ApiErrors::getApiError(ApiErrors::API_ERROR_USER_SENT_BAD_FILE);
+
             return response()->json($apiError['data'], $apiError['code']);
         }
 
@@ -117,21 +120,22 @@ class ApiController extends Controller {
      */
     public function resizeOldImage()
     {
-        /** @var User $user */
         $user = Auth::user();
 
         $newWidth = (int)Request::input('width');
         $newHeight = (int)Request::input('height');
         $imageId = \Route::current()->parameters()['image_id'];
-        $imageModel = \App\Models\Image::find($imageId);
+        $imageModel = Image::find($imageId);
 
-        if(!$imageModel instanceof \App\Models\Image) {
+        if(!$imageModel instanceof Image) {
             $apiError = ApiErrors::getApiError(ApiErrors::API_ERROR_IMAGE_NOT_FOUND);
+
             return response()->json($apiError['data'], $apiError['code']);
         }
         
         if($imageModel->user_id != $user->user_id) {
             $apiError = ApiErrors::getApiError(ApiErrors::API_ERROR_IMAGE_DOESNT_BELONG_TO_CURRENT_USER);
+
             return response()->json($apiError['data'], $apiError['code']);
         }
 

@@ -1,6 +1,7 @@
 <?php namespace App\Services\Image;
 
 use \App\Models\Image as ImageModel;
+use \Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class Repository {
 
@@ -13,10 +14,12 @@ class Repository {
      * @param $userId
      * @return \App\Models\Image|\Illuminate\Support\Collection|null|static
      */
-    static function saveImageFile(\Symfony\Component\HttpFoundation\File\UploadedFile $file, $userId)
+    static function saveImageFile(UploadedFile $file, $userId)
     {
         $fileFormat = self::getFileFormatByMimeType($file);
-        if($fileFormat) {
+
+        if($fileFormat)
+        {
             $newFileName = md5_file($file->getRealPath()) . '_' . $userId . '.' . $fileFormat;
 
             $newFilePath = base_path() . ImageModel::PATH;
@@ -24,6 +27,7 @@ class Repository {
 
             return $newFileName;
         }
+
         return false;
     }
 
@@ -31,7 +35,7 @@ class Repository {
      * @param \Symfony\Component\HttpFoundation\File\UploadedFile $file
      * @return bool
      */
-    static function getFileFormatByMimeType(\Symfony\Component\HttpFoundation\File\UploadedFile $file)
+    static function getFileFormatByMimeType(UploadedFile $file)
     {
         if(array_key_exists($file->getMimeType(),self::$imageFormats)) {
             return self::$imageFormats[$file->getMimeType()];

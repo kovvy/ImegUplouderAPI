@@ -13,10 +13,11 @@ class ValidateParameters {
      * @return \Symfony\Component\HttpFoundation\Response
      * @throws \Exception
      */
-    public function handle(\Illuminate\Http\Request $request, Closure $next)
+    public function handle(Request $request, Closure $next)
     {
         if(!$request->input('width') || !$request->input('height')) {
             $apiError = ApiErrors::getApiError(ApiErrors::API_ERROR_USER_SENT_BAD_HEIGHT_WIDTH);
+
             return response()->json($apiError['data'], $apiError['code']);
         }
 
